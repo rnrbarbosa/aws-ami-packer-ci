@@ -1,0 +1,39 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": "",
+    "region": "us-west-2",
+    "nuxeo_version": "8.3"
+  },
+"builders": [{
+  "type": "amazon-ebs",
+  "access_key": "{{user `aws_access_key`}}",
+  "secret_key": "{{user `aws_secret_key`}}",
+  "region": "{{user `region`}}",
+  "source_ami": "ami-a9d276c9",
+  "instance_type": "t2.micro",
+  "ssh_username": "ubuntu",
+  "ami_name": "packer-nuxeo-{{user `nuxeo_version`}} {{timestamp}}",
+  "subnet_id": "subnet-a585bed3",
+  "vpc_id": "vpc-d1a661b6",
+  "tags": {
+    "OS_Version": "Ubuntu",
+    "Release": "Xenial 16.04"
+  }
+}],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sleep 30",
+      "sudo apt-get update",
+      "sudo useradd -d /opt/nuxeo -p nuxeo -s /bin/bash nuxeo",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y acpid openjdk-8-jdk libreoffice imagemagick poppler-utils ffmpeg ffmpeg2theora ufraw libwpd-tools perl locales pwgen dialog supervisor unzip vim",
+      "curl -sSL http://cdn.nuxeo.com/nuxeo-{{user `nuxeo_version`}}/nuxeo-server-{{user `nuxeo_version`}}-tomcat.zip -o /tmp/nuxeo-distribution-tomcat.zip", 
+      "sudo unzip -q -d /opt /tmp/nuxeo-distribution-tomcat.zip ",
+      "sudo mv /opt/nuxeo-server-{{user `nuxeo_version`}}-tomcat /opt/nuxeo",
+      "sudo chown -R nuxeo /opt/nuxeo",
+      "sudo chmod +x /opt/nuxeo/bin/*ctl /opt/nuxeo/bin/*.sh ",
+      "sudo rm -rf /tmp/nuxeo-distribution* "
+    ]
+  }]
+}
