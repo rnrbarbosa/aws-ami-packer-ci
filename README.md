@@ -20,5 +20,5 @@ make build
 or 
 
 ```
-	packer build -var-file=./secrets.json packer-nuxeo.json
+packer build -var-file=./secrets.json packer-nuxeo.json
 ```
